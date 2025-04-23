@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Search Lab</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .search-container {
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 300px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #357ae8;
+    }
+    .item {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Products Search</h1>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search products or prices...">
+    <button id="searchButton">Search</button>
+  </div>
+  <div id="results">
+    <!-- Products will be populated here -->
+  </div>
+  <script>
+    // Product data stored in array
+    const productsData = [
+      {
+        id: 1,
+        name: "Laptop",
+        description: "Powerful laptop with 16GB RAM",
+        price: 999
+      },
+      {
+        id: 2,
+        name: "Smartphone",
+        description: "Latest smartphone with great camera",
+        price: 699
+      },
+      {
+        id: 3,
+        name: "Tablet",
+        description: "10-inch tablet perfect for entertainment",
+        price: 349
+      },
+      {
+        id: 4,
+        name: "Headphones",
+        description: "Noise cancelling wireless headphones",
+        price: 199
+      },
+      {
+        id: 5,
+        name: "Smartwatch",
+        description: "Fitness tracking smartwatch",
+        price: 249
+      }
+    ];
+
+    // Get DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const resultsContainer = document.getElementById('results');
+
+    // Function to render products
+    function renderProducts(products) {
+      // Clear the results container
+      resultsContainer.innerHTML = '';
+      // Render each product
+      products.forEach(product => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'item';
+
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = product.name;
+
+        const descElement = document.createElement('p');
+        descElement.textContent = product.description;
+
+        const priceElement = document.createElement('p');
+        priceElement.textContent = `Price: $${product.price}`;
+
+        // Append elements to the item
+        itemElement.appendChild(titleElement);
+        itemElement.appendChild(descElement);
+        itemElement.appendChild(priceElement);
+
+        // Append the item to the results container
+        resultsContainer.appendChild(itemElement);
+      });
+    }
+
+    // Function to check if search term is numeric
+    function isNumericSearch(term) {
+      return /\d/.test(term);
+    }
+
+    // Function to check if price matches search term
+    function matchesPrice(price, term) {
+      const cleanTerm = term.replace(/[$€£]/g, '');
+      return !isNaN(cleanTerm) && cleanTerm !== '' && price.includes(cleanTerm);
+    }
+
+    // Function to perform search
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+
+      // If search term is empty, show all items
+      if (searchTerm === '') {
+        renderProducts(productsData);
+        return;
+      }
+
+      // Filter products based on search term
+      const filteredProducts = productsData.filter(product => {
+        const nameMatch = product.name.toLowerCase().includes(searchTerm);
+        const descriptionMatch = product.description.toLowerCase().includes(searchTerm);
+        const priceMatch = isNumericSearch(searchTerm) && matchesPrice(product.price.toString(), searchTerm);
+        return nameMatch || descriptionMatch || priceMatch;
+      });
+
+      // Render filtered products
+      renderProducts(filteredProducts);
+    }
+
+    // Add event listeners
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keyup', function (event) {
+      if (event.key === 'Enter') {
+        performSearch();
+      }
+    });
+    searchInput.addEventListener('input', performSearch);
+
+    // Initial render of all products
+    renderProducts(productsData);
+  </script>
+</body>
+</html>
